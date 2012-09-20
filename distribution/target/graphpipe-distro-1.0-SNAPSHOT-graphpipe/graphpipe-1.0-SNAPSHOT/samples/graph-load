@@ -1,0 +1,15 @@
+#!/bin/sh
+
+dir=`dirname $0`
+
+(
+  echo "T1, T5, T15,";
+  while : ; 
+    do
+      uptime |
+        sed -e 's/^.*://'
+      sleep 1
+   done
+) |
+  ${dir}/../bin/graphpipe --max --min --base 5 --format csv $*
+
