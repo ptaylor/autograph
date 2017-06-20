@@ -1,6 +1,0 @@
-#!/bin/sh
-
-dir=`dirname $0`
-
-java -jar ${dir}/../lib/graphpipe-1.0-SNAPSHOT.jar $*
-
