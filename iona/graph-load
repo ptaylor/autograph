@@ -1,0 +1,15 @@
+#!/bin/sh 
+
+. ${PTAYLOR_HOME-/home/ptaylor}/bin/ptenv.sh
+
+(
+  echo "T1 T5 T15";
+  while : ; 
+    do
+      uptime |	
+	sed -e 's/^.*average://' |
+	  cols 1 2 3 ;
+      sleep 1
+   done
+) |
+  graph -max -min -base 5 $*

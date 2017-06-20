@@ -1,0 +1,24 @@
+#!/bin/sh
+
+#. ${PTAYLOR_HOME-/home/ptaylor}/bin/ptenv.sh
+
+PTAYLOR_BIN=.
+GRAPH_JAR=$PTAYLOR_BIN/graph.jar
+
+if [ ! -f "$GRAPH_JAR" ]; then
+    echo 1>&2 "[graph.jar not found; building from source]";
+    dir=/tmp/gr$$sr
+    mkdir $dir
+    mkdir $dir/org
+    mkdir $dir/org/pt
+    mkdir $dir/classes
+    for i in GraphMain.java Graph.java SamplerThread.java DataElement.java DataBuffer.java DataBufferIterator.java DataReader.java; do
+	cp $PTAYLOR_BIN/$i $dir/org/pt
+    done
+    javac -d $dir/classes $dir/org/pt/*.java
+    (cd $dir/classes; jar cf graph.jar org; cp graph.jar $GRAPH_JAR)
+    chmod a-w $GRAPH_JAR
+    rm -rf $dir
+fi
+
+java -classpath $GRAPH_JAR:$CLASSPATH org.pt.GraphMain "$@"
