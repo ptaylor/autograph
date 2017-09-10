@@ -12,6 +12,7 @@ import javafx.scene.layout.StackPane
 import javafx.stage.Stage
 import javafx.scene.canvas.Canvas
 import javafx.scene.paint.Color
+import javafx.geometry.VPos
 import javafx.scene.canvas.GraphicsContext 
 import javafx.concurrent.Task
 import javafx.application.Platform
@@ -19,8 +20,10 @@ import kotlin.concurrent.thread
 
 class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: Double, var height: Double, val size: Int) : Sampler() {
 
-    var count: Int = 0
+    var count =  0
     var history : History
+    var names = listOf<String>()
+    var numValues = -1
 
     var minValue: Double = Double.MAX_VALUE
     var maxValue: Double = Double.MIN_VALUE
@@ -53,6 +56,10 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     )
 
     val LINE_WIDTH = 1.0
+    val LEGEND_LINE_WIDTH = 2.0
+    val LEGEND_TEXT_WIDTH = 1.0
+    val LEGEND_LINE_LENGTH = 10.0
+    val LEGEND_BORDER_LEFT = 20.0
     val BORDER_COLOUR = Color.CHARTREUSE
     val BORDER_WIDTH = 0.5
     val MIN_MAX_COLOUR = Color.YELLOW
@@ -80,16 +87,16 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 	}
     }
 
-    fun clearGraph() {
-        gc.setFill(Color.WHITE)
-	gc.clearRect(0.0, 0.0, canvas.getWidth(), canvas.getHeight())
+    override fun newNames(strs: List<String>) {
+        checkSize(strs.size)
+        println("NAMES ${strs}")
+	names = strs
     }
- 
 
     override fun newValues(nums: List<Double>) {
 
+        checkSize(nums.size)
 
-       	println("NEW VALUES ${nums}")
 	calculateMinMax(nums)
 	resize()
         history.put(count++, nums)
@@ -100,8 +107,24 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 	}
     }
 
-    override fun newHeader(strs: List<String>) {
-        //println("GHEADER ${strs}");
+    private fun checkSize(s: Int) {
+        if (numValues < 0) {
+            numValues = s
+        }
+
+        if (s != numValues) {
+	    fatal("number of data values (${s}) is not as expected (${numValues})")
+	}
+	
+	if (s > LINE_COLOURS.size) {
+	    fatal("too many data values (${s}) for number of available colours (${LINE_COLOURS.size})")
+	}
+
+    }
+
+    private fun fatal(s: String) {
+        System.err.println("ERROR: ${s}")
+	Platform.exit()
     }
 
 
@@ -210,7 +233,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 	}
 
 	// Horizontal ticks (bottom)
-	for (i in 0 .. size) {
+	for (i in 0 .. size step size / 10) {
 	    val x = scalex(i.toDouble())
 	    line(x, height - borderBottom, x, height - borderBottom + TICK_LENGTH)
         }
@@ -221,6 +244,30 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 	dashedLine(borderLeft, scaley(minValue), width - borderRight, scaley(minValue), MIN_MAX_DASH_SIZE)
 	dashedLine(borderLeft, scaley(maxValue), width - borderRight, scaley(maxValue), MIN_MAX_DASH_SIZE)
 
+
+	drawLegend()
+
+    }
+
+    private fun drawLegend() {
+
+        gc.setTextBaseline(VPos.CENTER)
+        var i = 0
+	val step = (graphMaxValue - graphMinValue) / (names.size + 2)
+        for (name in names) {
+ 	    val colour = LINE_COLOURS[i]
+	    gc.setStroke(colour)
+	    val x = width - borderRight + LEGEND_BORDER_LEFT
+	    val y = scaley((names.size - (i - 1) ) * step)
+
+            gc.setLineWidth(LEGEND_LINE_WIDTH)
+	    line(x, y, x + LEGEND_LINE_LENGTH, y)
+
+            gc.setLineWidth(LEGEND_TEXT_WIDTH)
+	    text(name, x + LEGEND_LINE_LENGTH * 2, y)
+	    i = i + 1
+        }
+    
     }
 
     private fun plot(x1: Double, v1: Double, x2: Double, v2: Double) {
@@ -241,6 +288,16 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
         //println("LINE (${x1}, $y1}) - (${x2}, ${y2})")
 	gc.strokeLine(x1, y1, x2, y2)
     }
+
+    private fun text(s: String, x: Double, y: Double) {
+        gc.strokeText(s, x, y)
+    }
+
+    fun clearGraph() {
+        gc.setFill(Color.WHITE)
+	gc.clearRect(0.0, 0.0, canvas.getWidth(), canvas.getHeight())
+    }
+ 
 
 
     fun resize() {

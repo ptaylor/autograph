@@ -1,7 +1,12 @@
 package org.pftylr.autograph;
 
 fun splitIntoStrings(s: String) : List<String> {
-   return s.trim().split("\\s+".toRegex())
+   val strings = s.trim().split("\\s+".toRegex())
+   if (strings.size == 1 && strings[0].length == 0) {
+       return listOf<String>()
+   } else {
+       return strings
+   }
 }
 
 

@@ -3,7 +3,6 @@ package org.pftylr.autograph
 
 import org.pftylr.autograph.InputStreamDataSource
 import org.pftylr.autograph.Graph
-import org.pftylr.autograph.Test
 
 import javafx.application.Application
 import javafx.event.ActionEvent
@@ -46,6 +45,7 @@ class Autograph : Application() {
 
     override fun stop() {
         println("*** STOP ***")
+	System.exit(0)
     }
 
     fun change(listener: ChangeListener<Double>, x: Double, y: Double) {

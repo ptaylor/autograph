@@ -7,14 +7,14 @@ RANGE=${4-50}
 BASE=10
 DIFF="7 - 3"
 
-BASE
+
 echo 1>&2 SIZE ${SIZE}
 echo 1>&2 DELAY ${DELAY}
 echo 1>&2 MAX ${MAX}
 
 i=0
 while [ $i -lt ${SIZE} ] ; do
-  echo -n " "
+  echo -n "N${i} "
   i=`expr $i + 1`
 done
 echo ""
