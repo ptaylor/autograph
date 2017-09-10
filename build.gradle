@@ -85,14 +85,11 @@ test {
     }               
 }
 
+tasks.withType(Tar){
+    compression = Compression.GZIP
+}
 
 distributions {
-    main {
-//        baseName = 'autographit'
-//        contents {
-//            from { 'src/main/scripts' }
-//        }
-    }
 }
 
 mainClassName = 'org.pftylr.autograph.AutographMainKt'
