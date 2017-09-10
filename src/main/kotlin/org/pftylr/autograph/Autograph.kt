@@ -56,6 +56,10 @@ class Autograph : Application() {
 
     fun go(args: Array<String>) {
     // TODO pass args
+        args.forEach { 
+           println("arg: ${it}")
+        }
+
         launch()
      }
 

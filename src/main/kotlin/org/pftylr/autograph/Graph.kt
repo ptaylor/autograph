@@ -204,7 +204,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 	var x = history.size - 1
     	var previous : List<Double>? = null
 	for (nums in history.values) {
-	    if (previous != null && nums != null) {
+	    if (previous != null) {
 	        for (j in 0 .. nums.size - 1) {
 	      	    val color = LINE_COLOURS[j]
                     gc.setStroke(color);

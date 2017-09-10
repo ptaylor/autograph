@@ -28,5 +28,8 @@ package org.pftylr.autograph
 import org.pftylr.autograph.Autograph
 
 fun main(args : Array<String>) { 
+    args.forEach {
+       println("arg: ${it}")
+    }
     Autograph().go(args)
 }
