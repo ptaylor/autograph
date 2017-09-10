@@ -49,9 +49,9 @@ class Autograph : Application() {
 
     val title = "Autograph"
 
-    val WIDTH = 800.0
-    val HEIGHT = 400.0
-    val SIZE = 100
+    val WIDTH = 900.0
+    val HEIGHT = 500.0
+    val SIZE = 500
     val BG_COLOUR = Color.BLACK
 
     fun go(args: Array<String>) {

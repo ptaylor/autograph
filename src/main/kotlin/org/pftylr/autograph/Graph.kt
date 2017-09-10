@@ -79,13 +79,15 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     )
     val BORDER_TOP = 40.0
     val BORDER_BOTTOM = 40.0
-    val BORDER_LEFT = 60.0
-    val BORDER_RIGHT = 100.0
+    val BORDER_LEFT = 80.0
+    val BORDER_RIGHT = 140.0
     
+    val BORDER_COLOUR = Color.CHARTREUSE
+    val BORDER_WIDTH = 0.5
 
     val LINE_WIDTH = 1.0
     val TEXT_WIDTH = 1.0
-    val TEXT_COLOUR = Color.CHARTREUSE
+    val TEXT_COLOUR = BORDER_COLOUR
     val XAXIS_FONT = Font.font("Monospaced", 12.0)
     val YAXIS_FONT = Font.font("Monospaced", 8.0)
     val LEGEND_FONT = Font.font("Monospaced", 12.0)
@@ -94,9 +96,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     val LEGEND_TEXT_WIDTH = 1.0
     val LEGEND_LINE_LENGTH = 10.0
     val LEGEND_BORDER_LEFT = 20.0
-    val BORDER_COLOUR = Color.CHARTREUSE
-    val BORDER_WIDTH = 0.5
-    val MIN_MAX_COLOUR = Color.YELLOW
+    val MIN_MAX_COLOUR = Color.GREEN
     val MIN_MAX_WIDTH = 0.5
     val MIN_MAX_DASH_SIZE = 5.0
     val TICK_LENGTH = 4.0
@@ -293,13 +293,12 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     private fun drawLegend() {
 
         gc.setTextBaseline(VPos.CENTER)
-        var i = 0
-	val step = (graphMaxValue - graphMinValue) / (names.size + 2)
+	var y = scaley(maxValue)
+	var i = 0
         for (name in names) {
- 	    val colour = LINE_COLOURS[i]
+ 	    val colour = LINE_COLOURS[i++]
 	    gc.setStroke(colour)
 	    val x = width - BORDER_RIGHT + LEGEND_BORDER_LEFT
-	    val y = scaley((names.size - (i - 1) ) * step)
 
             gc.setLineWidth(LEGEND_LINE_WIDTH)
 	    gc.setTextAlign(TextAlignment.LEFT)
@@ -310,7 +309,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 	    gc.setFont(LEGEND_FONT)
 	    gc.setStroke(TEXT_COLOUR)
 	    text(name, x + LEGEND_LINE_LENGTH * 2, y)
-	    i = i + 1
+	    y += 20
         }
     
     }

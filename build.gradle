@@ -39,7 +39,7 @@ buildscript {
 apply plugin: 'kotlin'
 apply plugin: 'application'
 apply plugin: 'org.junit.platform.gradle.plugin'
-
+apply plugin: 'distribution'
 
 
 repositories {
@@ -77,11 +77,22 @@ junitPlatform {
         }
     }
 }
+
 test {
     reports {
         junitXml.enabled = false
         html.enabled = true
     }               
+}
+
+
+distributions {
+    main {
+//        baseName = 'autographit'
+//        contents {
+//            from { 'src/main/scripts' }
+//        }
+    }
 }
 
 mainClassName = 'org.pftylr.autograph.AutographMainKt'
