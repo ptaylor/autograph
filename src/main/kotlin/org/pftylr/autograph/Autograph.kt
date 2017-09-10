@@ -25,10 +25,10 @@ class Autograph : Application() {
 
     val title = "Autograph"
 
-    val WIDTH : Double = 800.0
-    val HEIGHT : Double = 400.0
+    val WIDTH = 800.0
+    val HEIGHT = 400.0
+    val SIZE = 100
     val BG_COLOUR = Color.BLACK
-    val FG_COLOUR = Color.WHITE
 
     fun go(args: Array<String>) {
     // TODO pass args
@@ -55,7 +55,7 @@ class Autograph : Application() {
 
         val dataSource = InputStreamDataSource(System.`in`)
 
-	val graph = Graph(root, dataSource, scene.width, scene.height, 100)
+	val graph = Graph(root, dataSource, scene.width, scene.height, SIZE)
 
 	val changeListener = object : ChangeListener<Number?> {
             public override fun changed(observable: ObservableValue<out Number?>?, oldValue: Number?, newValue: Number?) {

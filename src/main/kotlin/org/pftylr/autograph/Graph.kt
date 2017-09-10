@@ -158,9 +158,10 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 	   }
         }
 
+	val diff = Math.abs(maxValue - minValue) * 0.10
 	// TODO: make thibs more intelligent
-	graphMaxValue = maxValue + 10.0
-	graphMinValue = minValue - 10.0
+	graphMaxValue = maxValue + diff
+	graphMinValue = minValue - diff
 
 	//println("MIN/MAX ${graphMinValue} ${minValue} ${maxValue} ${graphMaxValue}")
     }
@@ -328,7 +329,6 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
         val cw = width - (BORDER_LEFT + BORDER_RIGHT)
 	val x = cw - (v / size) * cw + BORDER_LEFT
-    	//println("scalex ${v} -> ${x} (cw ${cw})")
 	return x
     }
 
@@ -337,7 +337,6 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
         val h = graphMaxValue - graphMinValue
     	val ch = height - (BORDER_TOP + BORDER_BOTTOM)
 	val y = height - ((v - graphMinValue) / h) * ch - BORDER_BOTTOM
-    	//println("scaley ${v} -> ${y} (h ${h} ch ${ch}) ${v - graphMinValue}")
 
    	return y
     }
