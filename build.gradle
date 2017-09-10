@@ -1,0 +1,86 @@
+buildscript {
+    repositories {
+        jcenter()  
+        mavenCentral()
+    }
+
+    ext.kotlin_version = kotlin_version
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+	classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0-RC2'
+    }
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'application'
+apply plugin: 'org.junit.platform.gradle.plugin'
+
+
+
+repositories {
+    jcenter()  
+    mavenCentral()
+    maven { url "http://dl.bintray.com/jetbrains/spek" }
+}
+
+
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+ 
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+    testCompile ("org.jetbrains.spek:spek-api:${spek_version}") {
+        //exclude group: 'org.jetbrains.kotlin'
+    }
+    testRuntime ("org.jetbrains.spek:spek-junit-platform-engine:${spek_version}") {
+        //exclude group: 'org.junit.platform'
+        //exclude group: 'org.jetbrains.kotlin'
+    }
+}
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin/'
+    test.java.srcDirs += 'src/test/kotlin/'
+}
+
+junitPlatform {
+    reportsDir file("$buildDir/test-results/junit-platform")
+    filters {
+        engines {
+            include 'spek'
+        }
+    }
+}
+test {
+    reports {
+        junitXml.enabled = false
+        html.enabled = true
+    }               
+}
+
+mainClassName = 'org.pftylr.autograph.AutographMainKt'
+/*
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Kotlin example',
+            'Implementation-Version': version,
+            'Main-Class': mainClassName
+    }
+}
+*/
+
+task fatJar(type: Jar) {
+ 
+   manifest {
+        attributes 'Implementation-Title': 'Kotlin example',
+            'Implementation-Version': version,
+            'Main-Class': mainClassName
+    }
+
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+

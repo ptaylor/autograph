@@ -1,0 +1,13 @@
+package org.pftylr.autograph
+
+import org.pftylr.autograph.Autograph
+
+fun main(args : Array<String>) { 
+  println("Hello, world!") 
+
+  Autograph.launch(args)
+  //var ds = InputStreamDataSource(System.`in`)
+//  var graph = Graph(ds, 400.0, 200.0, 400)
+//  graph.go()
+
+}
