@@ -23,33 +23,24 @@ import javafx.beans.value.ObservableValue
 
 class Autograph : Application() {
 
-     val title = "Autograph"
+    val title = "Autograph"
 
-     val WIDTH : Double = 800.0
-     val HEIGHT : Double = 400.0
-     val BG_COLOUR = Color.BLACK
-     val FG_COLOUR = Color.WHITE
+    val WIDTH : Double = 800.0
+    val HEIGHT : Double = 400.0
+    val BG_COLOUR = Color.BLACK
+    val FG_COLOUR = Color.WHITE
 
-     fun go() {
+    fun go(args: Array<String>) {
+    // TODO pass args
         launch()
      }
 
-    init {
-
-	println("**** __INIT__ ${this}")
-    }
-
     override fun init() {
-        println("*** INIT ***")
     }
 
     override fun stop() {
         println("*** STOP ***")
 	System.exit(0)
-    }
-
-    fun change(listener: ChangeListener<Double>, x: Double, y: Double) {
-      println("CHANGE")
     }
 
     override fun start(stage: Stage) {
@@ -64,20 +55,19 @@ class Autograph : Application() {
 
         val dataSource = InputStreamDataSource(System.`in`)
 
-	Graph(root, dataSource, 600.0, 300.0, 100).run()
+	val graph = Graph(root, dataSource, scene.width, scene.height, 100)
 
-/*
 	val changeListener = object : ChangeListener<Number?> {
             public override fun changed(observable: ObservableValue<out Number?>?, oldValue: Number?, newValue: Number?) {
-                 println("old ${oldValue} new ${newValue}")
-		 //println("canvas ${canvas.getHeight()} ${canvas.getWidth()}")
+		 graph.resize(scene.width, scene.height)
             }
         }
 
+	scene.widthProperty().addListener(changeListener)
+	scene.heightProperty().addListener(changeListener)
 
-	stage.widthProperty().addListener(changeListener)
-	stage.heightProperty().addListener(changeListener)
-*/
+	graph.run()
+
     }
 
 }

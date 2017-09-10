@@ -2,6 +2,7 @@ package org.pftylr.autograph
 
 import org.pftylr.autograph.Sampler
 import org.pftylr.autograph.History
+import org.pftylr.autograph.ResizableCanvas
 
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
@@ -32,11 +33,6 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     var graphMaxValue: Double = Double.MIN_VALUE
     var graphMinValue: Double = Double.MAX_VALUE
 
-    var borderTop: Double = 40.0
-    var borderBottom: Double = 40.0
-    var borderLeft: Double = 60.0
-    var borderRight: Double = 60.0
-    
     val canvas: Canvas
     val gc: GraphicsContext 
 
@@ -56,11 +52,17 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
                        Color.GOLD, 
 		       Color.IVORY
     )
+    val BORDER_TOP = 40.0
+    val BORDER_BOTTOM = 40.0
+    val BORDER_LEFT = 60.0
+    val BORDER_RIGHT = 100.0
+    
 
     val LINE_WIDTH = 1.0
     val TEXT_WIDTH = 1.0
     val TEXT_COLOUR = Color.CHARTREUSE
-    val AXIS_FONT = Font.font("Monospaced", 08.0)
+    val XAXIS_FONT = Font.font("Monospaced", 12.0)
+    val YAXIS_FONT = Font.font("Monospaced", 8.0)
     val LEGEND_FONT = Font.font("Monospaced", 12.0)
 
     val LEGEND_LINE_WIDTH = 2.0
@@ -77,12 +79,24 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     init {
         history = History(size + 1)
 
-        canvas = Canvas(width, height)
+        canvas = ResizableCanvas(width, height)
         gc = canvas.getGraphicsContext2D()
 
 	group.getChildren().add(canvas)
 
-	resize()
+	resize(width, height)
+    }
+
+    fun resize(width: Double, height: Double) {
+       //println("GRAPH RESIZE ${width} ${height}")
+       //canvas.resize(width, height)
+       canvas.setWidth(width)
+       canvas.setHeight(height)
+
+       calculateSizes()
+       Platform.runLater {
+           draw()
+       }
     }
 
     fun run() {
@@ -104,7 +118,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
         checkSize(nums.size)
 
 	calculateMinMax(nums)
-	resize()
+	calculateSizes()
         history.put(count++, nums)
 	if (count > 1) {
   	    Platform.runLater {
@@ -148,7 +162,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 	graphMaxValue = maxValue + 10.0
 	graphMinValue = minValue - 10.0
 
-	println("MIN/MAX ${graphMinValue} ${minValue} ${maxValue} ${graphMaxValue}")
+	//println("MIN/MAX ${graphMinValue} ${minValue} ${maxValue} ${graphMaxValue}")
     }
 
     private fun draw() {
@@ -179,36 +193,6 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
             x = x - 1;
 	    previous = nums
         }
-
-      
-    }
-    private fun xdrawGraph() {
-
-        gc.setLineWidth(LINE_WIDTH);
-
-	var x : Int = -2
-    	var previous : List<Double>? = null
-	println("HISTORY ${history}");
-	for (i in  history.size downTo 0) {
- 	   val nums = history.get(i)
-	   if (previous != null) {
-	       if (previous != null && nums != null) {
-	           for (j in 0 .. nums.size - 1) {
-	      	       val color = LINE_COLOURS[j]
-                       gc.setStroke(color);
-
-	               val v2 = previous[j]
-		       val v1 = nums[j]
-		       println("x ${x}, v1 ${v1}, ${v2} = (${scaley(v1)}, ${scaley(v2)})")
-		       plot(scalex((x + 1).toDouble()), scaley(v1), scalex(x.toDouble()), scaley(v2))
-	           } 
-	       }
-	   }
-
-           x = x + 1;
-	   previous = nums
-        }
-
       
     }
 
@@ -225,19 +209,19 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     private fun drawBorders() {
         gc.setStroke(BORDER_COLOUR)
 	gc.setLineWidth(BORDER_WIDTH)
-	line(borderLeft, borderTop, width - borderRight, borderTop)
-	line(borderLeft, height - borderBottom, width - borderRight, height - borderBottom)
-	line(borderLeft, borderTop, borderLeft, height - borderBottom)
-	line(width - borderRight, borderTop, width - borderRight, height - borderBottom)
+
+	line(BORDER_LEFT, BORDER_TOP, width - BORDER_RIGHT, BORDER_TOP)
+	line(BORDER_LEFT, height - BORDER_BOTTOM, width - BORDER_RIGHT, height - BORDER_BOTTOM)
+	line(BORDER_LEFT, BORDER_TOP, BORDER_LEFT, height - BORDER_BOTTOM)
+	line(width - BORDER_RIGHT, BORDER_TOP, width - BORDER_RIGHT, height - BORDER_BOTTOM)
     }
 
     private fun drawYAxis() {
 
-
 	// Verticle ticks (left side)
         gc.setTextBaseline(VPos.CENTER)
 	gc.setTextAlign(TextAlignment.RIGHT)
-	gc.setFont(AXIS_FONT)
+	gc.setFont(YAXIS_FONT)
 	val s : Double = (graphMaxValue - graphMinValue) / 10.0
 	var i : Double = graphMinValue
 	while (i <= graphMaxValue) {
@@ -245,11 +229,11 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
 	    gc.setLineWidth(BORDER_WIDTH);
             gc.setStroke(BORDER_COLOUR)
-	    line(borderLeft, y, borderLeft - TICK_LENGTH, y)
+	    line(BORDER_LEFT, y, BORDER_LEFT - TICK_LENGTH, y)
 
 	    gc.setLineWidth(TEXT_WIDTH);
 	    gc.setStroke(TEXT_COLOUR)
-	    text("%.2f".format(i), borderLeft - (TICK_LENGTH + 10), y)
+	    text("%.2f".format(i), BORDER_LEFT - (TICK_LENGTH + 10), y)
 
 	    i = i + s
 	}
@@ -262,15 +246,22 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 	    val x = scalex(i.toDouble())
 
 	    gc.setLineWidth(BORDER_WIDTH);
-	    line(x, height - borderBottom, x, height - borderBottom + TICK_LENGTH)
+	    line(x, height - BORDER_BOTTOM, x, height - BORDER_BOTTOM + TICK_LENGTH)
         }
+
+        gc.setTextBaseline(VPos.CENTER)
+	gc.setTextAlign(TextAlignment.CENTER)
+	gc.setFont(XAXIS_FONT)
+        gc.setStroke(TEXT_COLOUR)
+	text("", scalex(size / 2.0), height - BORDER_BOTTOM / 2)
+
     }
 
     private fun drawMinMaxLines() {
 	gc.setStroke(MIN_MAX_COLOUR)
 	gc.setLineWidth(MIN_MAX_WIDTH);
-	dashedLine(borderLeft, scaley(minValue), width - borderRight, scaley(minValue), MIN_MAX_DASH_SIZE)
-	dashedLine(borderLeft, scaley(maxValue), width - borderRight, scaley(maxValue), MIN_MAX_DASH_SIZE)
+	dashedLine(BORDER_LEFT, scaley(minValue), width - BORDER_RIGHT, scaley(minValue), MIN_MAX_DASH_SIZE)
+	dashedLine(BORDER_LEFT, scaley(maxValue), width - BORDER_RIGHT, scaley(maxValue), MIN_MAX_DASH_SIZE)
     }
 
     private fun drawLegend() {
@@ -281,9 +272,8 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
         for (name in names) {
  	    val colour = LINE_COLOURS[i]
 	    gc.setStroke(colour)
-	    val x = width - borderRight + LEGEND_BORDER_LEFT
+	    val x = width - BORDER_RIGHT + LEGEND_BORDER_LEFT
 	    val y = scaley((names.size - (i - 1) ) * step)
-println("name ${name} ${i} x ${x} y ${y}")
 
             gc.setLineWidth(LEGEND_LINE_WIDTH)
 	    gc.setTextAlign(TextAlignment.LEFT)
@@ -329,18 +319,15 @@ println("name ${name} ${i} x ${x} y ${y}")
  
 
 
-    fun resize() {
-        println("RESIZE ${canvas.width} ${canvas.height}")
-
+    fun calculateSizes() {
 	width = canvas.width
 	height = canvas.height
-	
     }
 
     private fun scalex(v: Double) : Double {
 
-        val cw = width - (borderLeft + borderRight)
-	val x = cw - (v / size) * cw + borderLeft
+        val cw = width - (BORDER_LEFT + BORDER_RIGHT)
+	val x = cw - (v / size) * cw + BORDER_LEFT
     	//println("scalex ${v} -> ${x} (cw ${cw})")
 	return x
     }
@@ -348,8 +335,8 @@ println("name ${name} ${i} x ${x} y ${y}")
     private fun scaley(v: Double) : Double {
 
         val h = graphMaxValue - graphMinValue
-    	val ch = height - (borderTop + borderBottom)
-	val y = height - ((v - graphMinValue) / h) * ch - borderBottom
+    	val ch = height - (BORDER_TOP + BORDER_BOTTOM)
+	val y = height - ((v - graphMinValue) / h) * ch - BORDER_BOTTOM
     	//println("scaley ${v} -> ${y} (h ${h} ch ${ch}) ${v - graphMinValue}")
 
    	return y
