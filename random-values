@@ -14,7 +14,7 @@ echo 1>&2 MAX ${MAX}
 
 i=0
 while [ $i -lt ${SIZE} ] ; do
-  echo -n "N${i} "
+  echo -n "`echo $i | tr 0123456789 ABCDEFGHIJ` "
   i=`expr $i + 1`
 done
 echo ""

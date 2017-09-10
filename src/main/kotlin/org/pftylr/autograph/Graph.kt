@@ -7,6 +7,8 @@ import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.scene.Scene
 import javafx.scene.Group
+import javafx.scene.text.TextAlignment
+import javafx.scene.text.Font
 import javafx.scene.control.Button
 import javafx.scene.layout.StackPane
 import javafx.stage.Stage
@@ -32,8 +34,8 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
     var borderTop: Double = 40.0
     var borderBottom: Double = 40.0
-    var borderLeft: Double = 40.0
-    var borderRight: Double = 100.0
+    var borderLeft: Double = 60.0
+    var borderRight: Double = 60.0
     
     val canvas: Canvas
     val gc: GraphicsContext 
@@ -56,6 +58,11 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     )
 
     val LINE_WIDTH = 1.0
+    val TEXT_WIDTH = 1.0
+    val TEXT_COLOUR = Color.CHARTREUSE
+    val AXIS_FONT = Font.font("Monospaced", 08.0)
+    val LEGEND_FONT = Font.font("Monospaced", 12.0)
+
     val LEGEND_LINE_WIDTH = 2.0
     val LEGEND_TEXT_WIDTH = 1.0
     val LEGEND_LINE_LENGTH = 10.0
@@ -63,7 +70,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     val BORDER_COLOUR = Color.CHARTREUSE
     val BORDER_WIDTH = 0.5
     val MIN_MAX_COLOUR = Color.YELLOW
-    val MIN_MAX_WIDTH = 0.2
+    val MIN_MAX_WIDTH = 0.5
     val MIN_MAX_DASH_SIZE = 5.0
     val TICK_LENGTH = 4.0
 
@@ -89,7 +96,6 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
     override fun newNames(strs: List<String>) {
         checkSize(strs.size)
-        println("NAMES ${strs}")
 	names = strs
     }
 
@@ -147,7 +153,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
     private fun draw() {
         clearGraph()
-	drawBorder()
+	drawBackground()
 	drawGraph()
     }
 
@@ -157,7 +163,6 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
 	var x = history.size - 1
     	var previous : List<Double>? = null
-	println("HISTORY ${history}, x ${x}");
 	for (nums in history.values) {
 	    if (previous != null && nums != null) {
 	        for (j in 0 .. nums.size - 1) {
@@ -166,7 +171,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
 	            val v2 = previous[j]
 		    val v1 = nums[j]
-		    println("x ${x}, v1 ${v1}, ${v2} = (${scaley(v1)}, ${scaley(v2)})")
+		    //println("x ${x}, v1 ${v1}, ${v2} = (${scaley(v1)}, ${scaley(v2)})")
 		    plot(scalex(x.toDouble()), scaley(v1), scalex((x + 1).toDouble()), scaley(v2))
 	        } 
 	    }
@@ -207,46 +212,65 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
       
     }
 
-    private fun drawBorder() {
+    private fun drawBackground() {
+
+    	drawBorders()
+	drawXAxis()
+	drawYAxis()
+	drawMinMaxLines()	
+	drawLegend()
+
+    }
+
+    private fun drawBorders() {
         gc.setStroke(BORDER_COLOUR)
-	gc.setLineWidth(BORDER_WIDTH);
-
-	// Top
+	gc.setLineWidth(BORDER_WIDTH)
 	line(borderLeft, borderTop, width - borderRight, borderTop)
-
-	// Bottom 
 	line(borderLeft, height - borderBottom, width - borderRight, height - borderBottom)
-
-	// Left side
 	line(borderLeft, borderTop, borderLeft, height - borderBottom)
-
-	// Right side
 	line(width - borderRight, borderTop, width - borderRight, height - borderBottom)
+    }
+
+    private fun drawYAxis() {
+
 
 	// Verticle ticks (left side)
+        gc.setTextBaseline(VPos.CENTER)
+	gc.setTextAlign(TextAlignment.RIGHT)
+	gc.setFont(AXIS_FONT)
 	val s : Double = (graphMaxValue - graphMinValue) / 10.0
 	var i : Double = graphMinValue
 	while (i <= graphMaxValue) {
             val y = scaley(i.toDouble())
+
+	    gc.setLineWidth(BORDER_WIDTH);
+            gc.setStroke(BORDER_COLOUR)
 	    line(borderLeft, y, borderLeft - TICK_LENGTH, y)
+
+	    gc.setLineWidth(TEXT_WIDTH);
+	    gc.setStroke(TEXT_COLOUR)
+	    text("%.2f".format(i), borderLeft - (TICK_LENGTH + 10), y)
+
 	    i = i + s
 	}
 
-	// Horizontal ticks (bottom)
+    }
+
+    private fun drawXAxis() {
+
 	for (i in 0 .. size step size / 10) {
 	    val x = scalex(i.toDouble())
+
+	    gc.setLineWidth(BORDER_WIDTH);
 	    line(x, height - borderBottom, x, height - borderBottom + TICK_LENGTH)
         }
-	
-	// Min/max lines
+    }
+
+    private fun drawMinMaxLines() {
 	gc.setStroke(MIN_MAX_COLOUR)
 	gc.setLineWidth(MIN_MAX_WIDTH);
 	dashedLine(borderLeft, scaley(minValue), width - borderRight, scaley(minValue), MIN_MAX_DASH_SIZE)
 	dashedLine(borderLeft, scaley(maxValue), width - borderRight, scaley(maxValue), MIN_MAX_DASH_SIZE)
-
-
-	drawLegend()
-
     }
 
     private fun drawLegend() {
@@ -259,11 +283,16 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 	    gc.setStroke(colour)
 	    val x = width - borderRight + LEGEND_BORDER_LEFT
 	    val y = scaley((names.size - (i - 1) ) * step)
+println("name ${name} ${i} x ${x} y ${y}")
 
             gc.setLineWidth(LEGEND_LINE_WIDTH)
+	    gc.setTextAlign(TextAlignment.LEFT)
+	    gc.setFont(LEGEND_FONT)
 	    line(x, y, x + LEGEND_LINE_LENGTH, y)
 
             gc.setLineWidth(LEGEND_TEXT_WIDTH)
+	    gc.setFont(LEGEND_FONT)
+	    gc.setStroke(TEXT_COLOUR)
 	    text(name, x + LEGEND_LINE_LENGTH * 2, y)
 	    i = i + 1
         }
@@ -271,7 +300,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     }
 
     private fun plot(x1: Double, v1: Double, x2: Double, v2: Double) {
-        println("Plot ${x1},${v1} ${x2},${v2}")
+        //println("Plot ${x1},${v1} ${x2},${v2}")
         line(x1 , v1 , x2, v2)
     }
 
