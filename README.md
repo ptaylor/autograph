@@ -22,3 +22,10 @@ A simple graphing tools which reads arbitrary data from stdin and displays a gra
 ```
 ./gradlew --info installDist
 ```
+
+##
+
+Creating distribution
+```
+./gradlew --info clean assembleDist
+```
