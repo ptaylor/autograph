@@ -22,45 +22,61 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
+#
+# Produce random data for testing autograph.
+#
+# Usage: random-values [NUM_COLUMNS] [NUM_ROWS] [MIN_VALUE] [MAX_VALUE] [DELTA] [DELAY]
+#
+# 
 
-SIZE=${1-3}
-DELAY=${2-0.3}
-MAX=${3-1000}
-RANGE=${4-50}
-BASE=10
-DIFF="7 - 3"
+NUM_COLUMNS=${1-3}
+NUM_ROWS=${2-10000}
+MIN_VALUE=${3-10}
+MAX_VALUE=${4-50}
+DELTA=${5-7}
+DELAY=${6-0.3}
 
+if [ ${MIN_VALUE} -gt ${MAX_VALUE} ] ; then
+  echo 1>&2 "WARNING: min value must be greater than max value"
+  MAX_VALUE=$MIN_VALUE
+fi
 
-echo 1>&2 SIZE ${SIZE}
-echo 1>&2 DELAY ${DELAY}
-echo 1>&2 MAX ${MAX}
+echo 1>&2 DATA: ${NUM_COLUMNS} x ${NUM_ROWS} ${MIN_VALUE}..${MAX_VALUE} +/ ${DELTA} ${DELAY}s
 
+random () {
+  min=$1
+  max=$2
+  expr $RANDOM % \( $max + 1 - $min \) + $min
+}
+
+# Output column names
 i=0
-while [ $i -lt ${SIZE} ] ; do
+while [ $i -lt ${NUM_COLUMNS} ] ; do
   echo -n "`echo $i | tr 0123456789 ABCDEFGHIJ` "
   i=`expr $i + 1`
 done
 echo ""
 
+# Initialise column values
 i=0
-while [ $i -lt ${SIZE} ] ; do
-  VALUE[$i]=`expr $RANDOM % ${RANGE} + ${BASE}`
+while [ $i -lt ${NUM_COLUMNS} ] ; do
+  VALUE[$i]=`random ${MIN_VALUE} ${MAX_VALUE}`
   i=`expr $i + 1`
 done
 
 count=0
-while [ $count -lt $MAX ] ; do 
+while [ $count -lt ${NUM_ROWS} ] ; do 
   count=`expr $count + 1`
   i=0
-  while [ $i -lt ${SIZE} ] ; do
+  while [ $i -lt ${NUM_COLUMNS} ] ; do
     echo -n "${VALUE[$i]} "
     i=`expr $i + 1`
   done
   echo ""
 
   i=0
-  while [ $i -lt ${SIZE} ] ; do
-    d=`expr $RANDOM % ${DIFF}`
+  while [ $i -lt ${NUM_COLUMNS} ] ; do
+    d=`random -${DELTA} ${DELTA}`
     VALUE[$i]=`expr ${VALUE[$i]} + ${d}`
     i=`expr $i + 1`
   done
