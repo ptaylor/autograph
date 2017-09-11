@@ -46,7 +46,7 @@ open class Options {
         //println("addPropertiesFile ${name}")
         val file = File(name)
         if (file.exists()) {
-            //println("addPropertiesFile adding")
+            //println("addPropertiesFile adding ${file}")
             addPropertiesInputStream(FileInputStream(file))
         } else {
             //println("addPropertiesFile ${name} does not exist")
