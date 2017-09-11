@@ -27,6 +27,6 @@ package org.pftylr.autograph
 
 import org.pftylr.autograph.Autograph
 
-fun main(args : Array<String>) { 
+fun main(args: Array<String>) {
     Autograph().go(args)
 }

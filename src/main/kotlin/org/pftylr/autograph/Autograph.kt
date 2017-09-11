@@ -38,7 +38,7 @@ import javafx.scene.layout.StackPane
 import javafx.stage.Stage
 import javafx.scene.canvas.Canvas
 import javafx.scene.paint.Color
-import javafx.scene.canvas.GraphicsContext 
+import javafx.scene.canvas.GraphicsContext
 import javafx.concurrent.Task
 
 import javafx.beans.value.ChangeListener
@@ -55,25 +55,25 @@ class Autograph : Application() {
     val BG_COLOUR = Color.BLACK
 
     fun go(args: Array<String>) {
-    // TODO pass args
-        args.forEach { 
-           println("arg: ${it}")
+        // TODO pass args
+        args.forEach {
+            println("arg: ${it}")
         }
 
         launch()
-     }
+    }
 
     override fun init() {
     }
 
     override fun stop() {
         println("*** STOP ***")
-	System.exit(0)
+        System.exit(0)
     }
 
     override fun start(stage: Stage) {
 
-	val root = Group()
+        val root = Group()
 
         val scene = Scene(root, WIDTH, HEIGHT, BG_COLOUR);
 
@@ -83,18 +83,18 @@ class Autograph : Application() {
 
         val dataSource = InputStreamDataSource(System.`in`)
 
-	val graph = Graph(root, dataSource, scene.width, scene.height, SIZE)
+        val graph = Graph(root, dataSource, scene.width, scene.height, SIZE)
 
-	val changeListener = object : ChangeListener<Number?> {
+        val changeListener = object : ChangeListener<Number?> {
             public override fun changed(observable: ObservableValue<out Number?>?, oldValue: Number?, newValue: Number?) {
-		 graph.resize(scene.width, scene.height)
+                graph.resize(scene.width, scene.height)
             }
         }
 
-	scene.widthProperty().addListener(changeListener)
-	scene.heightProperty().addListener(changeListener)
+        scene.widthProperty().addListener(changeListener)
+        scene.heightProperty().addListener(changeListener)
 
-	graph.run()
+        graph.run()
 
     }
 

@@ -44,9 +44,9 @@ class ResizableCanvas(width: Double, height: Double) : Canvas(width, height) {
 	heightProperty().addListener(changeListener)
 
     } 
-    */     
+    */
 
-    override fun isResizable(): Boolean  {
+    override fun isResizable(): Boolean {
         return true
     }
 
