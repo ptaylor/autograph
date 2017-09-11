@@ -47,19 +47,11 @@ import javafx.beans.value.ObservableValue
 
 class Autograph : Application() {
 
+
     val title = "Autograph"
 
-    val WIDTH = 900.0
-    val HEIGHT = 500.0
-    val SIZE = 500
-    val BG_COLOUR = Color.BLACK
 
-    fun go(args: Array<String>) {
-        // TODO pass args
-        args.forEach {
-            println("arg: ${it}")
-        }
-
+    fun run() {
         launch()
     }
 
@@ -73,28 +65,42 @@ class Autograph : Application() {
 
     override fun start(stage: Stage) {
 
-        val root = Group()
+        try {
+            val options = Options()
+            options.addSystemProperties()
+            options.addPropertiesFile("${System.getProperty("user.home")}/.autograph.properties")
+            options.addPropertiesResource("org/pftylr/autograph/autograph.properties")
 
-        val scene = Scene(root, WIDTH, HEIGHT, BG_COLOUR);
+            val width = options.getDoubleValue("width")
+            val height = options.getDoubleValue("height")
+            val size = options.getIntValue("size")
+            val bg_colour = Color.valueOf(options.getStringValue("bg_colour"))
 
-        stage.setTitle(title);
-        stage.setScene(scene);
-        stage.show();
+            val root = Group()
+            val scene = Scene(root, width!!, height!!, bg_colour);
 
-        val dataSource = InputStreamDataSource(System.`in`)
+            stage.setTitle(title);
+            stage.setScene(scene);
+            stage.show();
 
-        val graph = Graph(root, dataSource, scene.width, scene.height, SIZE)
+            val dataSource = InputStreamDataSource(System.`in`)
 
-        val changeListener = object : ChangeListener<Number?> {
-            public override fun changed(observable: ObservableValue<out Number?>?, oldValue: Number?, newValue: Number?) {
-                graph.resize(scene.width, scene.height)
+            val graph = Graph(root, dataSource, scene.width, scene.height, size!!, options)
+
+            val changeListener = object : ChangeListener<Number?> {
+                public override fun changed(observable: ObservableValue<out Number?>?, oldValue: Number?, newValue: Number?) {
+                    graph.resize(scene.width, scene.height)
+                }
             }
+
+            scene.widthProperty().addListener(changeListener)
+            scene.heightProperty().addListener(changeListener)
+
+            graph.run()
+
+        } catch (e: Exception) {
+            println("exception ${e}")
         }
-
-        scene.widthProperty().addListener(changeListener)
-        scene.heightProperty().addListener(changeListener)
-
-        graph.run()
 
     }
 

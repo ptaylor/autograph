@@ -1,3 +1,28 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 ptaylor
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package org.pftylr.autograph
 
 import java.util.Properties
@@ -18,21 +43,21 @@ open class Options {
     }
 
     fun addPropertiesFile(name: String) {
-        println("addPropertiesFile ${name}")
+        //println("addPropertiesFile ${name}")
         val file = File(name)
         if (file.exists()) {
-            println("addPropertiesFile adding")
+            //println("addPropertiesFile adding")
             addPropertiesInputStream(FileInputStream(file))
         } else {
-            println("addPropertiesFile ${name} does not exist")
+            //println("addPropertiesFile ${name} does not exist")
         }
     }
 
     fun addPropertiesResource(name: String) {
-        println("addPropertiesResource ${name}")
+        //println("addPropertiesResource ${name}")
         val i = Options::class.java.getClassLoader().getResourceAsStream(name)
         if (i != null) {
-            println("addPropertiesResource adding")
+            //println("addPropertiesResource adding")
             addPropertiesInputStream(i)
         } else {
             println("addPropertiesResource ${name} does not exist")
@@ -40,15 +65,16 @@ open class Options {
     }
 
     fun addSystemProperties() {
-        println("addPropertiesResource")
+        //println("addPropertiesResource")
         properties += System.getProperties()
     }
 
     fun getStringValue(name: String) : String? {
-        println("getStringValue ${name}")
+        //println("getStringValue ${name}")
         for (p in properties) {
             var s = p.getProperty(name)
             if (s != null) {
+                //println("-> ${s}")
                 return s
             }
         }
@@ -57,7 +83,7 @@ open class Options {
 
     fun getIntValue(name: String): Int? {
 
-        println("getIntValue ${name}")
+        //println("getIntValue ${name}")
         val s = getStringValue(name)
 
         if (s != null) {
@@ -69,7 +95,7 @@ open class Options {
 
     fun getDoubleValue(name: String): Double? {
 
-        println("getDoubleValue ${name}")
+        //println("getDoubleValue ${name}")
         val s = getStringValue(name)
 
         if (s != null) {
@@ -95,40 +121,4 @@ open class Options {
         return l
     }
 
-
 }
-
-
-class Funky (val options: Options ){
-
-
-    val foo : Int? by lazy {options.getIntValue("foo")}
-    val bar : Double? by lazy {options.getDoubleValue("bar")}
-    val baz : String? by lazy {options.getStringValue("baz")}
-    val colours : List<Color>? by lazy {options.getListValue("colours")?.map { Color.valueOf(it) }}
-
-}
-    fun main(args: Array<String>) {
-        println("version 2")
-        val options = Options()
-        val funky = Funky(options)
-        options.addSystemProperties()
-        options.addPropertiesFile("/tmp/options.properties")
-        options.addPropertiesResource("org/pftylr/autograph/autograph.properties")
-
-        println("")
-        println("foo ${funky.foo}")
-        println("bar ${funky.bar}")
-        println("baz ${funky.baz}")
-        println("colours ${funky.colours}")
-
-        println("")
-        println("foo ${funky.foo}")
-        println("bar ${funky.bar}")
-        println("baz ${funky.baz}")
-        println("colours ${funky.colours}")
-
-    }
-
-
-

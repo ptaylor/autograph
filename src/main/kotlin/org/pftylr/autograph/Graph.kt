@@ -28,6 +28,7 @@ package org.pftylr.autograph
 import org.pftylr.autograph.Sampler
 import org.pftylr.autograph.History
 import org.pftylr.autograph.ResizableCanvas
+import org.pftylr.autograph.Options
 
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
@@ -46,7 +47,7 @@ import javafx.concurrent.Task
 import javafx.application.Platform
 import kotlin.concurrent.thread
 
-class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: Double, var height: Double, val size: Int) : Sampler() {
+class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: Double, var height: Double, val size: Int, val options: Options) : Sampler() {
 
     var count = 0
     var history: History
@@ -62,44 +63,34 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     val gc: GraphicsContext
 
 
-    // https://docs.oracle.com/javase/8/javafx/api/javafx/scene/paint/Color.html
-    val LINE_COLOURS = listOf(
-            Color.ORANGE,
-            Color.BLUE,
-            Color.PINK,
-            Color.GREEN,
-            Color.RED,
-            Color.BROWN,
-            Color.CYAN,
-            Color.GRAY,
-            Color.DARKRED,
-            Color.VIOLET,
-            Color.GOLD,
-            Color.IVORY
-    )
-    val BORDER_TOP = 40.0
-    val BORDER_BOTTOM = 40.0
-    val BORDER_LEFT = 80.0
-    val BORDER_RIGHT = 140.0
+    val BORDER_TOP             : Double by lazy {options.getDoubleValue("border.top")!!}
+    val BORDER_BOTTOM          : Double by lazy {options.getDoubleValue("border.bottom")!!}
+    val BORDER_LEFT            : Double by lazy {options.getDoubleValue("border.left")!!}
+    val BORDER_RIGHT           : Double by lazy {options.getDoubleValue("border.right")!!}
 
-    val BORDER_COLOUR = Color.CHARTREUSE
-    val BORDER_WIDTH = 0.5
+    val BORDER_COLOUR          : Color by lazy {getColorValue("border.colour")}
+    val BORDER_WIDTH           : Double by lazy {options.getDoubleValue("border.width")!!}
 
-    val LINE_WIDTH = 1.0
-    val TEXT_WIDTH = 1.0
-    val TEXT_COLOUR = BORDER_COLOUR
-    val XAXIS_FONT = Font.font("Monospaced", 12.0)
-    val YAXIS_FONT = Font.font("Monospaced", 8.0)
-    val LEGEND_FONT = Font.font("Monospaced", 12.0)
+    val DATA_LINE_WIDTH        : Double by lazy {options.getDoubleValue("data.line.width")!!}
 
-    val LEGEND_LINE_WIDTH = 2.0
-    val LEGEND_TEXT_WIDTH = 1.0
-    val LEGEND_LINE_LENGTH = 10.0
-    val LEGEND_BORDER_LEFT = 20.0
-    val MIN_MAX_COLOUR = Color.GREEN
-    val MIN_MAX_WIDTH = 0.5
-    val MIN_MAX_DASH_SIZE = 5.0
-    val TICK_LENGTH = 4.0
+    val DATA_LINE_COLOURS      : List<Color> by lazy {options.getListValue("data.line.colour")?.map { Color.valueOf(it) }!!}
+
+    val TEXT_WIDTH             : Double by lazy {options.getDoubleValue("text.width")!!}          /// ?
+    val TEXT_COLOUR            : Color by lazy {getColorValue("text.colour")}
+
+    val XAXIS_FONT             : Font by lazy {getFontValue("yaxis.font")}
+    val YAXIS_FONT             : Font by lazy {getFontValue("xaxis.font")}
+    val AXIS_TICK_LENGTH       : Double by lazy {options.getDoubleValue("axis.tick.length")!!}
+    val LEGEND_LINE_WIDTH      : Double by lazy {options.getDoubleValue("legend.line.width")!!}
+    val LEGEND_LINE_LENGTH     : Double by lazy {options.getDoubleValue("legend.line.length")!!}
+    val LEGEND_TEXT_WIDTH      : Double by lazy {options.getDoubleValue("legend.text.width")!!}
+    val LEGEND_BORDER_LEFT     : Double by lazy {options.getDoubleValue("legend.border.left")!!}
+    val LEGEND_FONT            : Font by lazy {getFontValue("legend.font")}
+
+    val MIN_MAX_COLOUR         : Color by lazy {getColorValue("minmax.line.colour")}
+    val MIN_MAX_WIDTH          : Double by lazy {options.getDoubleValue("minmax.line.width")!!}
+    val MIN_MAX_DASH_SIZE      : Double by lazy {options.getDoubleValue("minmax.line.dash.length")!!}
+
 
     init {
         history = History(size + 1)
@@ -161,8 +152,8 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
             fatal("number of data values (${s}) is not as expected (${numValues})")
         }
 
-        if (s > LINE_COLOURS.size) {
-            fatal("too many data values (${s}) for number of available colours (${LINE_COLOURS.size})")
+        if (s > DATA_LINE_COLOURS.size) {
+            fatal("too many data values (${s}) for number of available colours (${DATA_LINE_COLOURS.size})")
         }
 
     }
@@ -199,14 +190,14 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
     private fun drawGraph() {
 
-        gc.setLineWidth(LINE_WIDTH);
+        gc.setLineWidth(DATA_LINE_WIDTH);
 
         var x = history.size - 1
         var previous: List<Double>? = null
         for (nums in history.values) {
             if (previous != null) {
                 for (j in 0..nums.size - 1) {
-                    val color = LINE_COLOURS[j]
+                    val color = DATA_LINE_COLOURS[j]
                     gc.setStroke(color);
 
                     val v2 = previous[j]
@@ -255,11 +246,11 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
             gc.setLineWidth(BORDER_WIDTH);
             gc.setStroke(BORDER_COLOUR)
-            line(BORDER_LEFT, y, BORDER_LEFT - TICK_LENGTH, y)
+            line(BORDER_LEFT, y, BORDER_LEFT - AXIS_TICK_LENGTH, y)
 
             gc.setLineWidth(TEXT_WIDTH);
             gc.setStroke(TEXT_COLOUR)
-            text("%.2f".format(i), BORDER_LEFT - (TICK_LENGTH + 10), y)
+            text("%.2f".format(i), BORDER_LEFT - (AXIS_TICK_LENGTH + 10), y)
 
             i = i + s
         }
@@ -272,7 +263,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
             val x = scalex(i.toDouble())
 
             gc.setLineWidth(BORDER_WIDTH);
-            line(x, height - BORDER_BOTTOM, x, height - BORDER_BOTTOM + TICK_LENGTH)
+            line(x, height - BORDER_BOTTOM, x, height - BORDER_BOTTOM + AXIS_TICK_LENGTH)
         }
 
         gc.setTextBaseline(VPos.CENTER)
@@ -296,7 +287,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
         var y = scaley(maxValue)
         var i = 0
         for (name in names) {
-            val colour = LINE_COLOURS[i++]
+            val colour = DATA_LINE_COLOURS[i++]
             gc.setStroke(colour)
             val x = width - BORDER_RIGHT + LEGEND_BORDER_LEFT
 
@@ -363,5 +354,17 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
         return y
     }
+
+    private fun getColorValue(n: String) : Color {
+        return Color.valueOf(options.getStringValue(n)!!)
+    }
+
+    private fun getFontValue(n: String) : Font {
+        val fontName = options.getStringValue("${n}.name")!!
+        val fontSize = options.getDoubleValue("${n}.size")!!
+        return Font.font(fontName, fontSize)
+    }
+
+
 
 }
