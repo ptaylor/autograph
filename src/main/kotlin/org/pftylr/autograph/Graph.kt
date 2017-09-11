@@ -75,15 +75,16 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
     val DATA_LINE_COLOURS      : List<Color> by lazy {options.getListValue("data.line.colour")?.map { Color.valueOf(it) }!!}
 
-    val TEXT_WIDTH             : Double by lazy {options.getDoubleValue("text.width")!!}          /// ?
-    val TEXT_COLOUR            : Color by lazy {getColorValue("text.colour")}
-
     val XAXIS_FONT             : Font by lazy {getFontValue("yaxis.font")}
     val YAXIS_FONT             : Font by lazy {getFontValue("xaxis.font")}
     val AXIS_TICK_LENGTH       : Double by lazy {options.getDoubleValue("axis.tick.length")!!}
+    val AXIS_TEXT_WIDTH        : Double by lazy {options.getDoubleValue("axis.text.width")!!}
+    val AXIS_TEXT_COLOUR       : Color by lazy {getColorValue("axis.text.colour")}
+
     val LEGEND_LINE_WIDTH      : Double by lazy {options.getDoubleValue("legend.line.width")!!}
     val LEGEND_LINE_LENGTH     : Double by lazy {options.getDoubleValue("legend.line.length")!!}
     val LEGEND_TEXT_WIDTH      : Double by lazy {options.getDoubleValue("legend.text.width")!!}
+    val LEGEND_TEXT_COLOUR     : Color by lazy {getColorValue("legend.text.colour")}
     val LEGEND_BORDER_LEFT     : Double by lazy {options.getDoubleValue("legend.border.left")!!}
     val LEGEND_FONT            : Font by lazy {getFontValue("legend.font")}
 
@@ -104,8 +105,6 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     }
 
     fun resize(width: Double, height: Double) {
-        //println("GRAPH RESIZE ${width} ${height}")
-        //canvas.resize(width, height)
         canvas.setWidth(width)
         canvas.setHeight(height)
 
@@ -157,12 +156,6 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
         }
 
     }
-
-    private fun fatal(s: String) {
-        System.err.println("ERROR: ${s}")
-        Platform.exit()
-    }
-
 
     private fun calculateMinMax(nums: List<Double>) {
         nums.forEach { n ->
@@ -235,10 +228,10 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
     private fun drawYAxis() {
 
-        // Verticle ticks (left side)
         gc.setTextBaseline(VPos.CENTER)
         gc.setTextAlign(TextAlignment.RIGHT)
         gc.setFont(YAXIS_FONT)
+
         val s: Double = (graphMaxValue - graphMinValue) / 10.0
         var i: Double = graphMinValue
         while (i <= graphMaxValue) {
@@ -248,8 +241,8 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
             gc.setStroke(BORDER_COLOUR)
             line(BORDER_LEFT, y, BORDER_LEFT - AXIS_TICK_LENGTH, y)
 
-            gc.setLineWidth(TEXT_WIDTH);
-            gc.setStroke(TEXT_COLOUR)
+            gc.setLineWidth(AXIS_TEXT_WIDTH);
+            gc.setStroke(AXIS_TEXT_COLOUR)
             text("%.2f".format(i), BORDER_LEFT - (AXIS_TICK_LENGTH + 10), y)
 
             i = i + s
@@ -269,7 +262,8 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
         gc.setTextBaseline(VPos.CENTER)
         gc.setTextAlign(TextAlignment.CENTER)
         gc.setFont(XAXIS_FONT)
-        gc.setStroke(TEXT_COLOUR)
+        gc.setStroke(AXIS_TEXT_COLOUR)
+        gc.setLineWidth(AXIS_TEXT_WIDTH);
         text("", scalex(size / 2.0), height - BORDER_BOTTOM / 2)
 
     }
@@ -283,7 +277,10 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
     private fun drawLegend() {
 
+        gc.setTextAlign(TextAlignment.LEFT)
         gc.setTextBaseline(VPos.CENTER)
+        gc.setFont(LEGEND_FONT)
+
         var y = scaley(maxValue)
         var i = 0
         for (name in names) {
@@ -292,13 +289,10 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
             val x = width - BORDER_RIGHT + LEGEND_BORDER_LEFT
 
             gc.setLineWidth(LEGEND_LINE_WIDTH)
-            gc.setTextAlign(TextAlignment.LEFT)
-            gc.setFont(LEGEND_FONT)
             line(x, y, x + LEGEND_LINE_LENGTH, y)
 
             gc.setLineWidth(LEGEND_TEXT_WIDTH)
-            gc.setFont(LEGEND_FONT)
-            gc.setStroke(TEXT_COLOUR)
+            gc.setStroke(LEGEND_TEXT_COLOUR)
             text(name, x + LEGEND_LINE_LENGTH * 2, y)
             y += 20
         }
@@ -306,7 +300,6 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     }
 
     private fun plot(x1: Double, v1: Double, x2: Double, v2: Double) {
-        //println("Plot ${x1},${v1} ${x2},${v2}")
         line(x1, v1, x2, v2)
     }
 
@@ -320,7 +313,6 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     }
 
     private fun line(x1: Double, y1: Double, x2: Double, y2: Double) {
-        //println("LINE (${x1}, $y1}) - (${x2}, ${y2})")
         gc.strokeLine(x1, y1, x2, y2)
     }
 
@@ -364,6 +356,12 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
         val fontSize = options.getDoubleValue("${n}.size")!!
         return Font.font(fontName, fontSize)
     }
+
+    private fun fatal(s: String) {
+        System.err.println("ERROR: ${s}")
+        Platform.exit()
+    }
+
 
 
 

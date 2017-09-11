@@ -48,9 +48,6 @@ import javafx.beans.value.ObservableValue
 class Autograph : Application() {
 
 
-    val title = "Autograph"
-
-
     fun run() {
         launch()
     }
@@ -75,6 +72,7 @@ class Autograph : Application() {
             val height = options.getDoubleValue("height")
             val size = options.getIntValue("size")
             val bg_colour = Color.valueOf(options.getStringValue("bg_colour"))
+	    val title = options.getStringValue("title")
 
             val root = Group()
             val scene = Scene(root, width!!, height!!, bg_colour);

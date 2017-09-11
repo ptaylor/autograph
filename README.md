@@ -7,7 +7,7 @@ A simple graphing tools which reads arbitrary data from stdin and displays a gra
 
 ## Examples
 ```
-./src/test/scripts/random-values 3 10000 10 100 5 1.0 | ./build/install/autograph/bin/autograph
+./src/test/scripts/random-values 5 10000 10 100 5 0.2 | ./build/install/autograph/bin/autograph
 ```
 
 
