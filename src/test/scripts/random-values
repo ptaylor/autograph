@@ -46,7 +46,8 @@ echo 1>&2 DATA: ${NUM_COLUMNS} x ${NUM_ROWS} ${MIN_VALUE}..${MAX_VALUE} +/ ${DEL
 random () {
   min=$1
   max=$2
-  expr $RANDOM % \( $max + 1 - $min \) + $min
+  #expr $RANDOM % \( $max + 1 - $min \) + $min
+  expr $(od -An -N4 -tu4 /dev/urandom)  % \( $max + 1 - $min \) + $min
 }
 
 # Output column names
