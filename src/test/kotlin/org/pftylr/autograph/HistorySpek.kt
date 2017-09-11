@@ -40,39 +40,39 @@ class HistorySpek : Spek({
 
         it("removes values once full") {
 
-            val history = History(3)
+            val history = History<Int>(3)
 
             assertEquals(0, history.size)
 
-            history.put(1, listOf<Double>(1.0, 1.1))
+            history.put(1, 1)
             assertEquals(1, history.size)
-            assertEquals(listOf<Double>(1.0, 1.1), history.get(1))
+            assertEquals(1, history.get(1))
 
-            history.put(2, listOf<Double>(2.0, 2.1))
+            history.put(2, 2)
             assertEquals(2, history.size)
-            assertEquals(listOf<Double>(1.0, 1.1), history.get(1))
-            assertEquals(listOf<Double>(2.0, 2.1), history.get(2))
+            assertEquals(1, history.get(1))
+            assertEquals(2, history.get(2))
 
-            history.put(3, listOf<Double>(3.0, 3.1))
+            history.put(3, 3)
             assertEquals(3, history.size)
-            assertEquals(listOf<Double>(1.0, 1.1), history.get(1))
-            assertEquals(listOf<Double>(2.0, 2.1), history.get(2))
-            assertEquals(listOf<Double>(3.0, 3.1), history.get(3))
+            assertEquals(1, history.get(1))
+            assertEquals(2, history.get(2))
+            assertEquals(3, history.get(3))
 
-            history.put(4, listOf<Double>(4.0, 4.1))
+            history.put(4, 4)
             assertEquals(3, history.size)
             assertNull(history.get(1))
-            assertEquals(listOf<Double>(2.0, 2.1), history.get(2))
-            assertEquals(listOf<Double>(3.0, 3.1), history.get(3))
-            assertEquals(listOf<Double>(4.0, 4.1), history.get(4))
+            assertEquals(2, history.get(2))
+            assertEquals(3, history.get(3))
+            assertEquals(4, history.get(4))
 
-            history.put(5, listOf<Double>(5.0, 5.1))
+            history.put(5, 5)
             assertEquals(3, history.size)
             assertNull(history.get(1))
             assertNull(history.get(2))
-            assertEquals(listOf<Double>(3.0, 3.1), history.get(3))
-            assertEquals(listOf<Double>(4.0, 4.1), history.get(4))
-            assertEquals(listOf<Double>(5.0, 5.1), history.get(5))
+            assertEquals(3, history.get(3))
+            assertEquals(4, history.get(4))
+            assertEquals(5, history.get(5))
 
         }
 

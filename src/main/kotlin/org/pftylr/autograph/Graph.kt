@@ -46,11 +46,14 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.concurrent.Task
 import javafx.application.Platform
 import kotlin.concurrent.thread
+import java.lang.Math
 
 class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: Double, var height: Double, val size: Int, val options: Options) : Sampler() {
 
     var count = 0
-    var history: History
+    var dataHistory: History<List<Double>>
+    var timeHistory: History<Long>
+    var currentDuration: Long = 0
     var names = listOf<String>()
     var numValues = -1
 
@@ -94,7 +97,8 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
 
     init {
-        history = History(size + 1)
+        dataHistory = History<List<Double>>(size + 1)
+	timeHistory = History<Long>(size + 1)
 
         canvas = ResizableCanvas(width, height)
         gc = canvas.getGraphicsContext2D()
@@ -134,7 +138,13 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
         calculateMinMax(nums)
         calculateSizes()
-        history.put(count++, nums)
+        dataHistory.put(count, nums)
+	timeHistory.put(count, System.currentTimeMillis())
+
+	val minIndex = Math.max(0, count - size)
+	currentDuration = timeHistory.get(count)!! - timeHistory.get(minIndex)!!
+
+	count++
         if (count > 1) {
             Platform.runLater {
                 draw()
@@ -185,9 +195,9 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
         gc.setLineWidth(DATA_LINE_WIDTH);
 
-        var x = history.size - 1
+        var x = dataHistory.size - 1
         var previous: List<Double>? = null
-        for (nums in history.values) {
+        for (nums in dataHistory.values) {
             if (previous != null) {
                 for (j in 0..nums.size - 1) {
                     val color = DATA_LINE_COLOURS[j]
@@ -264,7 +274,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
         gc.setFont(XAXIS_FONT)
         gc.setStroke(AXIS_TEXT_COLOUR)
         gc.setLineWidth(AXIS_TEXT_WIDTH);
-        text("", scalex(size / 2.0), height - BORDER_BOTTOM / 2)
+        text("${time2text(currentDuration)}", scalex(size / 2.0), height - BORDER_BOTTOM / 2)
 
     }
 

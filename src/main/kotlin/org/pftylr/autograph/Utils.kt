@@ -56,3 +56,14 @@ fun toNumList(s: List<String>): List<Double>? {
 
     return d
 }
+
+fun time2text(t: Long) : String {
+
+    var secs = t / 1000
+    val hours = (secs / (60 * 60)) % 24
+    val mins = (secs / 60) % 60
+    secs = secs % 60
+
+    return "%02d:%02d:%02d".format(hours, mins, secs)
+}
+

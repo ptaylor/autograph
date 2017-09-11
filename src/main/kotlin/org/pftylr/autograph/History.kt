@@ -25,9 +25,9 @@
 
 package org.pftylr.autograph
 
-class History(val maxSize: Int) : LinkedHashMap<Int, List<Double>>(maxSize) {
+class History<T>(val maxSize: Int) : LinkedHashMap<Int, T>(maxSize) {
 
-    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Int, List<Double>>?): Boolean {
+    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Int, T>?): Boolean {
         return size > maxSize
     }
 }

@@ -35,7 +35,7 @@ import kotlin.test.assertNull
 
 class UtilsSpec : Spek({
 
-    describe("splitIntoStrings") {
+     describe("splitIntoStrings") {
 
         listOf(
                 //listOf("test 1", "", ArrayList()),
@@ -80,5 +80,25 @@ class UtilsSpec : Spek({
         }
 
     }
+
+    describe("time2text") {
+
+        listOf(
+                listOf(0L, "00:00:00"),
+                listOf(500L, "00:00:00"),
+                listOf(1000L, "00:00:01"),
+                listOf(60000L, "00:01:00"),
+                listOf(3600000L, "01:00:00"),
+                listOf(82800000L, "23:00:00"),
+                listOf(20601000L, "05:43:21")
+        ).forEach { test ->
+
+            it("converts ${test[0]} to ${test[1]}") {
+                assertEquals(test[1], time2text(test[0] as Long))
+            }
+        }
+
+    }
+
 
 })
