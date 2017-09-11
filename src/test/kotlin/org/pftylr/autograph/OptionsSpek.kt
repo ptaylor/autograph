@@ -36,7 +36,7 @@ import java.io.File
 
 class OptionsSpec : Spek({
 
-    describe("getStringValue") {
+    describe("Options class") {
 
         it("get*Value can get typed values") {
 
