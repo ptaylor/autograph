@@ -26,7 +26,14 @@
 package org.pftylr.autograph;
 
 fun splitIntoStrings(s: String): List<String> {
-    val strings = s.trim().split("\\s+".toRegex())
+   
+    var strings: List<String>?
+
+    if (s.contains(",")) {
+        strings = s.split(",").map {it.trim()}
+    } else {
+        strings = s.trim().split("\\s+".toRegex())
+    }
     if (strings.size == 1 && strings[0].length == 0) {
         return listOf<String>()
     } else {

@@ -45,8 +45,8 @@ class InputStreamDataSource(val inputStream: InputStream) {
                 } else {
                     sampler.newNames(strs)
                 }
-                line = reader.readLine()
             }
+            line = reader.readLine()
         }
     }
 }

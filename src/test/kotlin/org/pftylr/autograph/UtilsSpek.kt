@@ -41,7 +41,8 @@ class UtilsSpec : Spek({
                 //listOf("test 1", "", ArrayList()),
                 listOf("one item", "one", listOf("one")),
                 listOf("three items", "one two three", listOf("one", "two", "three")),
-                listOf("lots of spaces", "  one  two   three ", listOf("one", "two", "three"))
+                listOf("lots of spaces", "  one  two   three ", listOf("one", "two", "three")),
+                listOf("data with commas", "  one,  two ,  three ", listOf("one", "two", "three"))
         ).forEach { test ->
 
             it("converts a list with ${test[0]}") {

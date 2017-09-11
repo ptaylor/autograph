@@ -14,7 +14,7 @@ A simple graphing tools which reads arbitrary data from stdin and displays a gra
 
 ## Graph load averages
 ```
-(echo "1-min 5-mins 15-mins"; while : ; do uptime | sed -e 's/^.*://' ; sleep 1; done) | ./build/install/autograph/bin/autograph
+(echo "1 min, 5 mins, 15 mins"; while : ; do uptime | sed -e 's/^.*://' ; sleep 1; done) | ./build/install/autograph/bin/autograph
 ```
 
 ## Graph process memory usage
