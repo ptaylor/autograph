@@ -17,6 +17,12 @@ A simple graphing tools which reads arbitrary data from stdin and displays a gra
 (echo "1-min 5-mins 15-mins"; while : ; do uptime | sed -e 's/^.*://' ; sleep 1; done) | ./build/install/autograph/bin/autograph
 ```
 
+## Graph process memory usage
+PID=<process-id>
+```
+(echo 'VSZ RSS'; while : ; do  ps aux   | awk '{ if ($2 == $PID)  print $5, $6 } '; sleep 1; done) | ~/github/autograph/build/install/autograph/bin/autograph
+```
+
 ## Building
 
 ```
