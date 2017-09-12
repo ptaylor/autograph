@@ -1,24 +1,25 @@
 # autograph
 
-
-A simple graphing tools which reads arbitrary data from stdin and displays a graph in real time. Allows simple scripts to be written to visualize data inputs.
-
+Automatically displays time graph of arbitary data.   
 
 
-## Examples
+## Example: random graph
 ```
 ./src/test/scripts/random-values 5 10000 10 100 5 0.2 | ./build/install/autograph/bin/autograph
 ```
 
+![Screenshot](/src/doc/images/random_graph.png)
 
 
-## Graph load averages
+## Example: load averages
 ```
 (echo "1 min, 5 mins, 15 mins"; while : ; do uptime | sed -e 's/^.*://' ; sleep 1; done) | ./build/install/autograph/bin/autograph
 ```
 
-## Graph process memory usage
-PID=<process-id>
+![Screenshot](/src/doc/images/load_average_graph.png)
+
+## Example: memory usage of a process
+PID=??
 ```
 (echo 'VSZ RSS'; while : ; do  ps aux   | awk '{ if ($2 == $PID)  print $5, $6 } '; sleep 1; done) | ~/github/autograph/build/install/autograph/bin/autograph
 ```
