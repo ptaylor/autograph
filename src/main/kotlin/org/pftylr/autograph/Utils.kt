@@ -25,6 +25,8 @@
 
 package org.pftylr.autograph;
 
+import java.text.DecimalFormat
+
 fun splitIntoStrings(s: String): List<String> {
    
     var strings: List<String>?
@@ -67,3 +69,17 @@ fun time2text(t: Long) : String {
     return "%02d:%02d:%02d".format(hours, mins, secs)
 }
 
+fun createDecimalFormat(max: Double) : DecimalFormat {
+    val baseFormat = "###,###,##0"
+    var suffix = ""
+    if (max < 100) {
+        suffix += "0"
+    }
+    if (max < 10) {
+        suffix += "0"
+    }
+    if (max < 1) {
+        suffix += "0"
+    }
+    return DecimalFormat("${baseFormat}${if (suffix != "") "." else ""}${suffix}")
+}

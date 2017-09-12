@@ -100,5 +100,27 @@ class UtilsSpec : Spek({
 
     }
 
+    describe("createDecimalFormat") {
+
+        listOf(
+                listOf(0.002, "0.002"),
+                listOf(0.01, "0.010"),
+                listOf(0.0, "0.000"),
+                listOf(1.0, "1.00"),
+                listOf(2.0, "2.00"),
+                listOf(9.0, "9.00"),
+                listOf(11.0, "11.0"),
+                listOf(21.1, "21.1"),
+                listOf(110.02, "110")
+        ).forEach { test ->
+
+            it("returns  ${test[1]} for ${test[0]}") {
+                assertEquals(test[1], createDecimalFormat(test[0] as Double).format(test[0] as Double))
+            }
+        }
+
+    }
+
+
 
 })

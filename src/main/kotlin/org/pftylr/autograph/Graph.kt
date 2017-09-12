@@ -177,12 +177,11 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
             }
         }
 
-        val diff = Math.abs(maxValue - minValue) * 0.10
         // TODO: make thibs more intelligent
+        val diff = Math.abs(maxValue - minValue) * 0.10
         graphMaxValue = maxValue + diff
         graphMinValue = minValue - diff
 
-        //println("MIN/MAX ${graphMinValue} ${minValue} ${maxValue} ${graphMaxValue}")
     }
 
     private fun draw() {
@@ -205,7 +204,6 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
                     val v2 = previous[j]
                     val v1 = nums[j]
-                    //println("x ${x}, v1 ${v1}, ${v2} = (${scaley(v1)}, ${scaley(v2)})")
                     plot(scalex(x.toDouble()), scaley(v1), scalex((x + 1).toDouble()), scaley(v2))
                 }
             }
@@ -242,6 +240,8 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
         gc.setTextAlign(TextAlignment.RIGHT)
         gc.setFont(YAXIS_FONT)
 
+        val format = createDecimalFormat(graphMaxValue)
+
         val s: Double = (graphMaxValue - graphMinValue) / 10.0
         var i: Double = graphMinValue
         while (i <= graphMaxValue) {
@@ -253,7 +253,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
             gc.setLineWidth(AXIS_TEXT_WIDTH);
             gc.setStroke(AXIS_TEXT_COLOUR)
-            text("%.2f".format(i), BORDER_LEFT - (AXIS_TICK_LENGTH + 10), y)
+            text(format.format(i), BORDER_LEFT - (AXIS_TICK_LENGTH + 10), y)
 
             i = i + s
         }
