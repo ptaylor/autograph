@@ -91,6 +91,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     val LEGEND_BORDER_LEFT     : Double by lazy {options.getDoubleValue("legend.border.left")!!}
     val LEGEND_FONT            : Font by lazy {getFontValue("legend.font")}
 
+    val MIN_MAX_ENABLED        : Boolean by lazy {options.getBooleanValue("minmax.enabled")}
     val MIN_MAX_COLOUR         : Color by lazy {getColorValue("minmax.line.colour")}
     val MIN_MAX_WIDTH          : Double by lazy {options.getDoubleValue("minmax.line.width")!!}
     val MIN_MAX_DASH_SIZE      : Double by lazy {options.getDoubleValue("minmax.line.dash.length")!!}
@@ -98,7 +99,7 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
     init {
         dataHistory = History<List<Double>>(size + 1)
-	timeHistory = History<Long>(size + 1)
+	    timeHistory = History<Long>(size + 1)
 
         canvas = ResizableCanvas(width, height)
         gc = canvas.getGraphicsContext2D()
@@ -123,7 +124,6 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
         val sampler = this
         thread(name = "sampler") {
             dataSource.process(sampler)
-            println("*** PROCESS THREAD FINISHED")
         }
     }
 
@@ -139,12 +139,12 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
         calculateMinMax(nums)
         calculateSizes()
         dataHistory.put(count, nums)
-	timeHistory.put(count, System.currentTimeMillis())
+        timeHistory.put(count, System.currentTimeMillis())
 
-	val minIndex = Math.max(0, count - size)
-	currentDuration = timeHistory.get(count)!! - timeHistory.get(minIndex)!!
+        val minIndex = Math.max(0, count - size)
+        currentDuration = timeHistory.get(count)!! - timeHistory.get(minIndex)!!
 
-	count++
+        count++
         if (count > 1) {
             Platform.runLater {
                 draw()
@@ -262,11 +262,14 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
 
     private fun drawXAxis() {
 
-        for (i in 0..size step size / 10) {
-            val x = scalex(i.toDouble())
+        val s = size / 10
+        if (s > 0) {
+            for (i in 0..size step size / 10) {
+                val x = scalex(i.toDouble())
 
-            gc.setLineWidth(BORDER_WIDTH);
-            line(x, height - BORDER_BOTTOM, x, height - BORDER_BOTTOM + AXIS_TICK_LENGTH)
+                gc.setLineWidth(BORDER_WIDTH);
+                line(x, height - BORDER_BOTTOM, x, height - BORDER_BOTTOM + AXIS_TICK_LENGTH)
+            }
         }
 
         gc.setTextBaseline(VPos.CENTER)
@@ -279,10 +282,12 @@ class Graph(val group: Group, val dataSource: InputStreamDataSource, var width: 
     }
 
     private fun drawMinMaxLines() {
-        gc.setStroke(MIN_MAX_COLOUR)
-        gc.setLineWidth(MIN_MAX_WIDTH);
-        dashedLine(BORDER_LEFT, scaley(minValue), width - BORDER_RIGHT, scaley(minValue), MIN_MAX_DASH_SIZE)
-        dashedLine(BORDER_LEFT, scaley(maxValue), width - BORDER_RIGHT, scaley(maxValue), MIN_MAX_DASH_SIZE)
+        if (MIN_MAX_ENABLED) {
+            gc.setStroke(MIN_MAX_COLOUR)
+            gc.setLineWidth(MIN_MAX_WIDTH);
+            dashedLine(BORDER_LEFT, scaley(minValue), width - BORDER_RIGHT, scaley(minValue), MIN_MAX_DASH_SIZE)
+            dashedLine(BORDER_LEFT, scaley(maxValue), width - BORDER_RIGHT, scaley(maxValue), MIN_MAX_DASH_SIZE)
+        }
     }
 
     private fun drawLegend() {

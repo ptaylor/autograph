@@ -28,5 +28,5 @@ package org.pftylr.autograph
 import org.pftylr.autograph.Autograph
 
 fun main(args: Array<String>) {
-    Autograph().run()
+    Autograph().run(args)
 }

@@ -35,46 +35,39 @@ open class Options {
 
     var properties = listOf<Properties>()
 
+    fun addProperties(p: Properties) {
+        properties += p
+    }
+
+    fun addSystemProperties() {
+        addProperties(System.getProperties())
+    }
 
     fun addPropertiesInputStream(i : InputStream) {
         val p = Properties()
         p.load(i)
-        properties += p
+        addProperties(p)
     }
 
     fun addPropertiesFile(name: String) {
-        //println("addPropertiesFile ${name}")
         val file = File(name)
         if (file.exists()) {
-            //println("addPropertiesFile adding ${file}")
             addPropertiesInputStream(FileInputStream(file))
-        } else {
-            //println("addPropertiesFile ${name} does not exist")
         }
     }
 
     fun addPropertiesResource(name: String) {
-        //println("addPropertiesResource ${name}")
         val i = Options::class.java.getClassLoader().getResourceAsStream(name)
         if (i != null) {
-            //println("addPropertiesResource adding")
             addPropertiesInputStream(i)
-        } else {
-            println("addPropertiesResource ${name} does not exist")
         }
     }
 
-    fun addSystemProperties() {
-        //println("addPropertiesResource")
-        properties += System.getProperties()
-    }
 
     fun getStringValue(name: String) : String? {
-        //println("getStringValue ${name}")
         for (p in properties) {
             var s = p.getProperty(name)
             if (s != null) {
-                //println("-> ${s}")
                 return s
             }
         }
@@ -83,7 +76,6 @@ open class Options {
 
     fun getIntValue(name: String): Int? {
 
-        //println("getIntValue ${name}")
         val s = getStringValue(name)
 
         if (s != null) {
@@ -95,7 +87,6 @@ open class Options {
 
     fun getDoubleValue(name: String): Double? {
 
-        //println("getDoubleValue ${name}")
         val s = getStringValue(name)
 
         if (s != null) {
@@ -103,6 +94,13 @@ open class Options {
         }
 
         return null
+    }
+
+    fun getBooleanValue(name: String): Boolean {
+        when (getStringValue(name)) {
+            "true" -> return true
+            else -> return false
+        }
     }
 
     fun getListValue(name: String): List<String>? {

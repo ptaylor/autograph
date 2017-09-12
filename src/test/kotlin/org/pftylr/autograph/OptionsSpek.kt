@@ -31,6 +31,8 @@ import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import java.util.Properties
+
 
 import java.io.File
 
@@ -47,12 +49,21 @@ class OptionsSpec : Spek({
             assertEquals(2.2, options.getDoubleValue("p2"))
             assertEquals("three", options.getStringValue("p3"))
             assertEquals(null, options.getIntValue("p4"))
+            assertEquals(true, options.getBooleanValue("b1"))
+            assertEquals(false, options.getBooleanValue("b2"))
+            assertEquals(false, options.getBooleanValue("b3"))
+
         }
 
 
         it("get*Value returns the first value found") {
 
             val options = Options()
+
+            val p = Properties()
+            p.setProperty("p7", "777")
+            options.addProperties(p)
+
             System.setProperty("p5", "five")
             options.addSystemProperties()
             val file = Options::class.java.getClassLoader().getResource("org/pftylr/autograph/test3.properties").toURI().getPath()
@@ -60,13 +71,13 @@ class OptionsSpec : Spek({
             options.addPropertiesResource("org/pftylr/autograph/test2.properties")
             options.addPropertiesResource("org/pftylr/autograph/test1.properties")
 
-
             assertEquals(11, options.getIntValue("p1"))
             assertEquals(3.3, options.getDoubleValue("p2"))
             assertEquals("THREE", options.getStringValue("p3"))
             assertEquals(44, options.getIntValue("p4"))
             assertEquals("five", options.getStringValue("p5"))
             assertEquals(666, options.getIntValue("p6"))
+            assertEquals(777, options.getIntValue("p7"))
         }
 
         it("getListValue returns a list of strings") {
